@@ -37,12 +37,28 @@
     cursor: pointer;
 }
 
+/***********************************************************
+** Little text infos
+************************************************************/
+
 #farm-run-info{
     text-align: center;
     font-size: 10pt;
     color: rgb(103, 103, 103);
     padding: 5px 0px;
 }
+
+#current-farm-herb{
+    color: #199b4f;
+}
+
+#current-numb-patches{
+    color: rgb(142, 68, 173)
+}
+
+/***********************************************************
+** Save Run Button
+************************************************************/
 
 #save-run-button{
     background-color: #0d6330;
@@ -63,10 +79,12 @@
     cursor: pointer;
 }
 
-#current-farm-herb{
-    color: #199b4f;
-}
+/***********************************************************
+** Errors
+************************************************************/
 
-#current-numb-patches{
-    color: rgb(142, 68, 173)
+#farm-run-error{
+    color: red;
+    font-size: 20px;
+    text-align: center;
 }

@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const console = require("./modules/console");
 const request = require("request-promise");
+const axios = require('axios');
 const path = require("path");
 const fs = require("fs-extra");
 
@@ -20,19 +21,18 @@ app.listen(8080, () => {
     console.log('Server started!');
 });
 
+/***********************************************************
+** GET requests
+************************************************************/
+
 app.route('/').get((req, res) => {
     res.sendFile("./src/index.html", { root: "." });
-});
-
-app.route("/post/farmRun").post(function(req, res) {
-    //now req.body will be populated with the object you sent
-    console.object(req.body); //prints john
 });
 
 app.route("/get/farmRun/").get(async (req, res) => {
     //TODO check if the g.e. has been updated so we don't spam the API
     // Save the data locally and check if x minutes have passed since last check
-    const conString = `http://localhost:2254/api/farmRun`;
+    const conString = `http://localhost:2254/get/farmRun`;
     let temp = await request(conString);
     res.send(temp);
 });
@@ -44,4 +44,18 @@ app.route("/get/version/").get(async (req, res) => {
         fs.writeJSONSync("./src/json/versionNum.json", versionNum);
     }
     res.send(versionNum);
+});
+
+/***********************************************************
+** POST requests
+************************************************************/
+
+app.route("/post/farmRun").post(function(req, res) {
+    axios.post("http://localhost:2254/post/farmRun",req.body).then((reply) => {
+        res.send(reply.data);
+    }).catch((error) =>{
+        res.sendStatus(500);
+    });
+
+    
 });

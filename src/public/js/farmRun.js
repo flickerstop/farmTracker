@@ -29,6 +29,7 @@ function setupFarmPage(){
     $("#numberOfPassRes").val(0);
     $("#numberOfFailRes").val(0);
     $("#numberOfCured").val(0);
+    d3.select("#farm-run-error").html("").style('display', "none");
 
 }
 
@@ -74,6 +75,7 @@ function saveFarmData(){
      * resPass
      * costs
      * netProfit
+     * time
      */
     let toSend = {
         key: saveData.key,
@@ -86,16 +88,21 @@ function saveFarmData(){
         resFail: numFail,
         resPass: numRes,
         costs: totalCost,
-        netProfit: profit
+        netProfit: profit,
+        time: Date.now()
     }
 
-    $.post("/post/farmRun", toSend);
+    $.post("/post/farmRun", toSend,function( data ) {
+        if(data == "invalid_key"){
+            d3.select("#farm-run-error").html("INVALID KEY!").style('display', null);
+        }else{
+            setupFarmPage();
+            //TODO start the countdown
+        }
+        
+    });
 
     function find(id){
         return prices.find(x=> x.id == id).sell;
     }
-}
-
-function setFarmRunInfo(){
-
 }
