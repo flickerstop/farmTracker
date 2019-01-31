@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="/js/farmRun.js"></script>
+        <script src="/js/webStorage.js"></script>
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/css/farmRun.css">
+        <link rel="stylesheet" href="/css/home.css">
+    </head>
+    <body id="body">
+        <!----------------------------------------------------------
+        > Top Bar
+        <----------------------------------------------------------->
+        <div id="topBar">
+            <div id="topBar-left"></div>
+            <div id="topBar-middle">middle</div>
+            <div id="topBar-right">
+                <div class="icon" onclick="stateSwitcher(1)" style='background-image:url("./images/home.png")'></div>
+                <div class="icon" onclick="stateSwitcher(2)" style='background-image:url("./images/Farming_icon.png")'></div>
+                <div class="icon" onclick="stateSwitcher(4)" style='background-image:url("./images/settingsIcon.png")'></div>
+            </div>
+        </div>
+        <!----------------------------------------------------------
+        > Main Panel
+        <----------------------------------------------------------->
+        <div id="mainPanel" class="scrollBarStyle">
+            <!----------------------------------------------------------
+            > Home Page
+            <----------------------------------------------------------->
+            <div id="homePage">
+                <div class="home-button" onclick="stateSwitcher(2)">Track Run</div>
+                <div class="home-button"onclick="stateSwitcher(3)">Past Runs</div>
+                <div class="home-button"onclick="stateSwitcher(4)">Settings</div>
+            </div>
+            <!----------------------------------------------------------
+            > Track Farm runs
+            <----------------------------------------------------------->
+            <div id="track-farm-run" style="display: none;">
+                <h1 id="farm-run-timer">00:00:00</h1>
+                <div id="stop-run-button">Stop Farm Run</div>
+                <div id="farm-run-info">
+                    <div>Currently running <span id="current-farm-herb">Ranarr Weeds</span> with <span id="current-numb-patches">9</span> patches</div>
+                    <div id="attas-boost" style="color: rgb(192, 57, 43);">No Attas boost</div>
+                </div>
+                <!-- Number of Herbs -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Herbs:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('numberOfHerbs')">-</div>
+                        <input type="number" placeholder="Enter me!" id="numberOfHerbs">
+                        <div class="increment-button" onclick="incrementValue('numberOfHerbs')">+</div>
+                    </div>
+                </div>
+                <!-- Number of Dead -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Dead Patches:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('numberOfDeadPatches')">-</div>
+                        <input type="number" value="0" id="numberOfDeadPatches">
+                        <div class="increment-button" onclick="incrementValue('numberOfDeadPatches')">+</div>
+                    </div>
+                </div>
+                <!-- Number of Res Pass -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Resurrected Successfully:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('numberOfPassRes')">-</div>
+                        <input type="number" value="0" id="numberOfPassRes">
+                        <div class="increment-button" onclick="incrementValue('numberOfPassRes')">+</div>
+                    </div>
+                </div>
+                <!-- Number of Res Fail -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Failed Resurrection:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('numberOfFailRes')">-</div>
+                        <input type="number" value="0" id="numberOfFailRes">
+                        <div class="increment-button" onclick="incrementValue('numberOfFailRes')">+</div>
+                    </div>
+                </div>
+                <!-- Number of Cured -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Cured Patches:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('numberOfCured')">-</div>
+                        <input type="number" value="0" id="numberOfCured">
+                        <div class="increment-button" onclick="incrementValue('numberOfCured')">+</div>
+                    </div>
+                </div>
+                <div id="save-run-button">Save Run</div>
+            </div>
+            <!----------------------------------------------------------
+            > Past Farm runs
+            <----------------------------------------------------------->
+            <div id="past-farm-runs" style="display: none;"></div>
+            <!----------------------------------------------------------
+            > Settings
+            <----------------------------------------------------------->
+            <div id="settings" style="display: none;"></div>
+        </div>
+    </body>
+</html>
+
+
+<script>
+
+
+    $(document).ready(function () {
+        load();
+        getVersionNumber();
+        getFarmPrices();
+    });
+
+    /**
+     * All of these functions are used as onclick events
+    **/
+
+    function stateSwitcher(state){
+        hideElement("#homePage");
+        hideElement("#track-farm-run");
+        hideElement("#past-farm-runs");
+        hideElement("#settings");
+        switch(state){
+            case 1: // Homepage
+                showElement("#homePage");
+                break;
+            case 2: // Track Farm Run
+                setupFarmPage();
+                showElement("#track-farm-run");
+                break;
+            case 3: // Past Farm Runs
+                showElement("#past-farm-runs");
+                break;
+            case 4: // Settings
+                showElement("#settings");
+                break;
+        }
+    }
+
+    function hideElement(elementID){
+        d3.select(elementID).style('display', 'none');
+    }
+    function showElement(elementID){
+        d3.select(elementID).style('display', null);
+    }
+    /**
+     * Increments the current value of the given div ID by 1
+     */
+    function incrementValue(divID){
+        // Get the current value
+        let currentValue = parseInt($("#" + divID).val());
+        // Check if not a number
+        if(isNaN(currentValue)){
+            currentValue = 0;
+        }
+        // set the new value to 1 greater than the old
+        $("#" + divID).val(currentValue+1);
+    }
+
+    /**
+     * Decrements the current value of the given div ID by 1
+     */
+    function decrementValue(divID) {
+        // Get the current value
+        let currentValue = parseInt($("#" + divID).val());
+        // Check if not a number
+        if (isNaN(currentValue)) {
+            currentValue = 0;
+            return;
+        } else if (currentValue == 0) {
+            return;
+        }
+        // set the new value to 1 greater than the old
+        $("#" + divID).val(currentValue - 1);
+    }
+</script>

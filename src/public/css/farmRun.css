@@ -1,0 +1,72 @@
+/***********************************************************
+** 
+** Goes from top to bottom of the farm panel
+** 
+************************************************************/
+
+/***********************************************************
+** Farm Timer
+************************************************************/
+#farm-run-timer{
+    margin-top: 50px;
+    text-align: center;
+    width: 100%;
+}
+
+
+/***********************************************************
+** Stop Button
+************************************************************/
+
+#stop-run-button{
+    background-color: #922a1e;
+    color: white;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 25%;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    margin: 5px auto;
+}
+
+#stop-run-button:hover{
+    background-color: #e74c3c;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+#farm-run-info{
+    text-align: center;
+    font-size: 10pt;
+    color: rgb(103, 103, 103);
+    padding: 5px 0px;
+}
+
+#save-run-button{
+    background-color: #0d6330;
+    color: white;
+    color: white;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 25%;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    margin: 25px auto;
+}
+#save-run-button:hover{
+    background-color: #2ecc71;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+#current-farm-herb{
+    color: #199b4f;
+}
+
+#current-numb-patches{
+    color: rgb(142, 68, 173)
+}

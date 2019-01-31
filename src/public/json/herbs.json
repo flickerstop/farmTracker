@@ -1,0 +1,59 @@
+[
+    {
+        "name": "Guam Leaf",
+        "herbID": 122,
+        "seedID": 2730
+    },{
+        "name": "Marrentill",
+        "herbID": 124,
+        "seedID": 2731
+    },{
+        "name": "Tarromin",
+        "herbID": 126,
+        "seedID": 2733
+    },{
+        "name": "Harralander",
+        "herbID": 128,
+        "seedID": 2734
+    },{
+        "name": "Ranarr weed",
+        "herbID": 130,
+        "seedID": 2735
+    },{
+        "name": "Toadflax",
+        "herbID": 1472,
+        "seedID": 2737
+    },{
+        "name": "Irit Leaf",
+        "herbID": 132,
+        "seedID": 2738
+    },{
+        "name": "Avantoe",
+        "herbID": 134,
+        "seedID": 2739
+    },{
+        "name": "Kwuarm",
+        "herbID": 136,
+        "seedID": 2741
+    },{
+        "name": "Snapdragon",
+        "herbID": 1473,
+        "seedID": 2742
+    },{
+        "name": "Cadantine",
+        "herbID": 138,
+        "seedID": 2744
+    },{
+        "name": "Lantadyme",
+        "herbID": 1311,
+        "seedID": 2746
+    },{
+        "name": "Dwarf weed",
+        "herbID": 140,
+        "seedID": 2747
+    },{
+        "name": "Torstol",
+        "herbID": 142,
+        "seedID": 2748
+    }
+]

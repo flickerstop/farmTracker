@@ -1,0 +1,19 @@
+{
+  "name": "farmtracker",
+  "version": "0.0.1",
+  "description": "An OSRS farm run tracker",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "flickerstop",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "fs-extra": "^7.0.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  }
+}

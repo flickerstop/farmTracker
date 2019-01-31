@@ -1,0 +1,25 @@
+/***********************************************************
+** Home Buttons
+************************************************************/
+.home-button{
+    width: 50%;
+    border: 1px solid white;
+    height: 100px;
+    margin: 50px 25%;
+    text-align: center;
+    line-height: 100px;
+    cursor: pointer;
+    border-radius: 25px;
+    user-select: none;
+    font-size: 25px;
+}
+.home-button:hover{
+    border: 1px solid white;
+    background-color: white;
+    color: black;
+}
+.home-button:active{
+    border: 1px solid rgb(52, 152, 219);
+    background-color: rgb(52, 152, 219);
+    color: white;
+}
