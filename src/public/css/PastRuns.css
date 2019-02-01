@@ -1,0 +1,42 @@
+#run-herb-type{
+    width: calc(100% - 10px);
+    margin-left: 10px;
+}
+
+.past-run-toggle-button{
+    float: left;
+    border: 1px solid white;
+    font-size: 15px;
+    line-height: 38px;
+    text-align: center;
+    height: 38px;
+    margin: 0px 5px;
+    border-radius: 25px;
+}
+.past-run-toggle-button:hover{
+    background-color: white;
+    color: black;
+    cursor: pointer;
+}
+
+.past-run-toggle-button-selected{
+    background-color: #00A1CB;
+    float: left;
+    border: 1px solid white;
+    font-size: 15px;
+    line-height: 38px;
+    text-align: center;
+    height: 38px;
+    margin: 0px 5px;
+    border-radius: 25px;
+}
+
+.toggle-button-info{
+    color: rgb(103, 103, 103);
+    margin-top: 25px;
+    padding-top: 5px;
+    margin-bottom: 5px;
+    border-top: 1px solid white;
+    width: 100%;
+    text-align: center;
+}

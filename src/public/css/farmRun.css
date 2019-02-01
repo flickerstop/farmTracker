@@ -56,28 +56,6 @@
     color: rgb(142, 68, 173)
 }
 
-/***********************************************************
-** Save Run Button
-************************************************************/
-
-#save-run-button{
-    background-color: #0d6330;
-    color: white;
-    color: white;
-    border: 1px solid white;
-    border-radius: 10px;
-    width: 25%;
-    height: 45px;
-    line-height: 45px;
-    text-align: center;
-    margin: 25px auto;
-}
-#save-run-button:hover{
-    background-color: #2ecc71;
-    color: black;
-    border: 1px solid black;
-    cursor: pointer;
-}
 
 /***********************************************************
 ** Errors

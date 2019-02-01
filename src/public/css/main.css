@@ -105,7 +105,7 @@
 }
 
 /***********************************************************
-** Universal
+** Two sided row
 ************************************************************/
 .two-side-row{
     height: 45px;
@@ -121,6 +121,10 @@
 .left-side{
     text-align: right;
 }
+
+/***********************************************************
+** Input Fields in two sided rows
+************************************************************/
 
 .right-side input{
     margin-top: 2px;
@@ -142,6 +146,23 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0; 
 }
 
+.right-side input[type=text]{
+    width: 184px;
+    border: 1px solid white;
+    text-align: left;
+}
+
+.right-side select{
+    width: 184px;
+    border: 1px solid white;
+    background-color: rgb(39, 39, 39);
+    color: white;
+    line-height: 40px;
+    margin-top: 2px;
+    height: 40px;
+    font-size: 15px;
+}
+
 .increment-button{
     width: 40px;
     text-align: center;
@@ -160,4 +181,66 @@ input[type=number]::-webkit-outer-spin-button {
     border: 1px solid rgb(52, 152, 219);
     background-color: rgb(52, 152, 219);
     color: white;
+}
+
+.toggle-button-off{
+    width: 85px;
+    margin-right: 10px;
+    border: 1px solid white;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 2px;
+    float: left;
+    opacity: 0.2;
+}
+.toggle-button-off:hover{
+    cursor: pointer;
+    color: black;
+    background-color: white;
+    opacity: 1.0;
+}
+
+.toggle-button-on{
+    width: 85px;
+    margin-right: 10px;
+    border: 1px solid white;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 2px;
+    float: left;
+    background-color: #00A1CB;
+}
+
+/***********************************************************
+** Save Button
+************************************************************/
+
+#save-button{
+    background-color: #0d6330;
+    color: white;
+    color: white;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 25%;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    margin: 25px auto;
+}
+#save-button:hover{
+    background-color: #2ecc71;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+/***********************************************************
+** Titles
+************************************************************/
+
+.border-bottom{
+    margin: 50px 0px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid white;
 }

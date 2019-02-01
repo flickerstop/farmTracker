@@ -4,9 +4,14 @@
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="/js/farmRun.js"></script>
         <script src="/js/webStorage.js"></script>
+        <script src="/js/settings.js"></script>
+        <script src="/js/pastRuns.js"></script>
         <link rel="stylesheet" href="/css/main.css">
         <link rel="stylesheet" href="/css/farmRun.css">
         <link rel="stylesheet" href="/css/home.css">
+        <link rel="stylesheet" href="/css/pastRuns.css">
+        <script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@3.24.2"></script>
     </head>
     <body id="body">
         <!----------------------------------------------------------
@@ -88,17 +93,62 @@
                         <div class="increment-button" onclick="incrementValue('numberOfCured')">+</div>
                     </div>
                 </div>
-                <div id="save-run-button" onclick="saveFarmData()">Save Run</div>
+                <div id="save-button" onclick="saveFarmData()">Save Run</div>
                 <div id="farm-run-error" style="display: none;"></div>
             </div>
             <!----------------------------------------------------------
             > Past Farm runs
             <----------------------------------------------------------->
-            <div id="past-farm-runs" style="display: none;"></div>
+            <div id="past-farm-runs" style="display: none;">
+                <h3 class="toggle-button-info">Select Your Herb Type</h3>
+                <div id="run-herb-type"></div>
+                <h3 class="toggle-button-info">Select Your Boost</h3>
+                <div>
+                    <div id="all-boost-runs" class="past-run-toggle-button-selected" style="width: calc(33% - 13px)">All</div>
+                    <div id="no-boost-runs" class="past-run-toggle-button" style="width: calc(33% - 13px)">None</div>
+                    <div id="yes-boost-runs" class="past-run-toggle-button" style="width: calc(33% - 13px)">Attas Plant</div>
+                </div>
+            </div>
             <!----------------------------------------------------------
             > Settings
             <----------------------------------------------------------->
-            <div id="settings" style="display: none;"></div>
+            <div id="settings" style="display: none;">
+                <h1 class="border-bottom">Settings</h1>
+                <!-- API key -->
+                <div class="two-side-row">
+                    <div class="left-side">Access Key:</div>
+                    <div class="right-side">
+                        <input type="text" placeholder="Enter me!" id="settings-access-key">
+                    </div>
+                </div>
+                <!-- Number of patches -->
+                <div class="two-side-row">
+                    <div class="left-side">Number of Patches:</div>
+                    <div class="right-side">
+                        <div class="increment-button" onclick="decrementValue('settings-number-patches')">-</div>
+                        <input type="number" id="settings-number-patches" value="0">
+                        <div class="increment-button" onclick="incrementValue('settings-number-patches')">+</div>
+                    </div>
+                </div>
+                <!-- Attas Boost -->
+                <div class="two-side-row">
+                    <div class="left-side">Attas Plant Boost:</div>
+                    <div class="right-side">
+                        <div class="toggle-button-off" onclick="attasBoostToggle(1)" id="settings-attas-on">ON</div>
+                        <div class="toggle-button-off" onclick="attasBoostToggle(0)" id="settings-attas-off">OFF</div>
+                    </div>
+                </div>
+                <!-- Plant Select -->
+                <div class="two-side-row">
+                    <div class="left-side">Herb Type:</div>
+                    <div class="right-side">
+                        <select id="settings-herb-type" value="0"> 
+                        </select>
+                    </div>
+                </div>
+                <!-- Save Settings -->
+                <div id="save-button" onclick="saveSettings();stateSwitcher(1);">Save Settings</div>
+            </div>
         </div>
     </body>
 </html>
@@ -111,7 +161,11 @@
         load();
         getVersionNumber();
         getFarmPrices();
+        
     });
+
+    //NOTE how to use vega
+    //vegaEmbed('#past-farm-runs','https://vega.github.io/vega/examples/bar-chart.vg.json',{defaultStyle: false});
 
     /**
      * All of these functions are used as onclick events
@@ -132,8 +186,11 @@
                 break;
             case 3: // Past Farm Runs
                 showElement("#past-farm-runs");
+                //FIXME REMOVE THIS, TEMP FIX
+                getPastRuns();
                 break;
             case 4: // Settings
+                setupSettingsPage();
                 showElement("#settings");
                 break;
         }

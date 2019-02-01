@@ -3,7 +3,7 @@ let prices = null;
 let herbTable = null;
 
 function getFarmPrices(){
-    $.get("/get/farmRun", function (data) {
+    $.get("/get/farmRun/prices", function (data) {
         prices = JSON.parse(data);
     });
     $.getJSON("./json/herbs.json", function (json) {
@@ -98,6 +98,7 @@ function saveFarmData(){
         }else{
             setupFarmPage();
             //TODO start the countdown
+            //NOTE if unable to push to server, maybe store in local storage and try to push later?
         }
         
     });

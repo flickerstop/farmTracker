@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: true }))
 
 let versionNum = null;
+const apiServer = "http://localhost:2254";
 
 // Start listening on a port
 app.listen(8080, () => {
@@ -29,10 +30,10 @@ app.route('/').get((req, res) => {
     res.sendFile("./src/index.html", { root: "." });
 });
 
-app.route("/get/farmRun/").get(async (req, res) => {
+app.route("/get/farmRun/prices").get(async (req, res) => {
     //TODO check if the g.e. has been updated so we don't spam the API
     // Save the data locally and check if x minutes have passed since last check
-    const conString = `http://localhost:2254/get/farmRun`;
+    const conString = apiServer+`/get/farmRun/prices`;
     let temp = await request(conString);
     res.send(temp);
 });
@@ -46,16 +47,23 @@ app.route("/get/version/").get(async (req, res) => {
     res.send(versionNum);
 });
 
+app.route('/get/farmRun/runs/:key').get((req, res) => {
+    const requestedKey = req.params['key'];
+    request(apiServer+"/get/farmRun/runs/"+requestedKey).then((runs) =>{
+        res.send(runs);
+    }).catch((err)=>{
+        res.send(err);
+    });
+});
+
 /***********************************************************
 ** POST requests
 ************************************************************/
 
 app.route("/post/farmRun").post(function(req, res) {
-    axios.post("http://localhost:2254/post/farmRun",req.body).then((reply) => {
+    axios.post(apiServer+"/post/farmRun",req.body).then((reply) => {
         res.send(reply.data);
     }).catch((error) =>{
         res.sendStatus(500);
     });
-
-    
 });
