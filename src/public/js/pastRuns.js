@@ -31,6 +31,14 @@ function setupPastRunsPage(){
             .html(herb);
     }
 
+    // draw the past runs in a list
+    let pastRunsList = d3.select("#list-past-runs-body");
+    for(let run of pastRuns){
+        let temp = pastRunsList.append("tr");
+        temp.append("td").html(run.herbType);
+        temp.append("td").html(run.herbs);
+        temp.append("td").html(run.netProfit - run.costs);
+    }
 
 
 }
