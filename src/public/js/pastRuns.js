@@ -32,12 +32,18 @@ function setupPastRunsPage(){
     }
 
     // draw the past runs in a list
-    let pastRunsList = d3.select("#list-past-runs-body");
+    let pastRunsList = d3.select("#list-past-runs-body").html(null);
     for(let run of pastRuns){
         let temp = pastRunsList.append("tr");
         temp.append("td").html(run.herbType);
         temp.append("td").html(run.herbs);
         temp.append("td").html(run.netProfit - run.costs);
+        if(run.attas == 1){
+            temp.append("td").html("On");
+        }else{
+            temp.append("td").html("Off");
+        }
+        
     }
 
 
