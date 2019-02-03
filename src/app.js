@@ -25,7 +25,8 @@ app.listen(8080, () => {
 /***********************************************************
 ** GET requests
 ************************************************************/
-
+//FIXME check for SQL injection or people trying to bypass the front end validation (probably add to API)
+//TODO add anti-spam
 app.route('/').get((req, res) => {
     res.sendFile("./src/index.html", { root: "." });
 });

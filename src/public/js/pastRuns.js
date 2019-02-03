@@ -1,10 +1,18 @@
 
-let pastRuns = null;
-
+let pastRunPage = {
+    pastRuns: null,
+    herbType: "All",
+    boostType: 2,
+    maxPatch: 0,
+    lists:{
+        types:[],
+        max:[]
+    }
+}
 
 function getPastRuns(){
     $.get("/get/farmRun/runs/"+saveData.key, function (data) {
-        pastRuns = JSON.parse(data);
+        pastRunPage.pastRuns = JSON.parse(data);
         console.log("Past runs grabbed!");
         //TODO error check if the data passed back is an error
 
@@ -13,38 +21,311 @@ function getPastRuns(){
     });
 }
 
+/**
+ * 
+ * @param {*} herbType Type of herb to filter by
+ * @param {*} boost 0 = none, 1 = attas, 2 = all
+ */
 function setupPastRunsPage(){
+
+    let filteredRuns = generateFilteredList();
+
+    resetAttasButtons();
+
     // find all the types of herbs that were farmed
-    let listOfHerbs = ["All"];
-    for(let run of pastRuns){
-        if(listOfHerbs.find(x=>x.toLowerCase()==run.herbType.toLowerCase()) == undefined){
-            listOfHerbs.push(run.herbType);
+    drawHerbTypeButtons(pastRunPage.pastRuns)
+
+    // number of patches buttons
+    drawNumberOfPatchesButtons(pastRunPage.pastRuns);
+
+
+    
+    
+
+    if(filteredRuns.length == 0){
+        //TODO delete the graph and list and show that no runs of this type are done
+    }else{
+        drawVegaGraph(filteredRuns);
+        drawRunList(filteredRuns);
+    }
+    
+    disableButtons(filteredRuns);
+
+    /***********************************************************
+    ** Functions to draw parts of the page
+    ************************************************************/
+    function drawRunList(runs){
+        let pastRunsList = d3.select("#list-past-runs-body").html(null);
+        for(let run of runs){
+            let temp = pastRunsList.append("tr");
+            temp.append("td").html(run.herbType);
+            temp.append("td").html(run.herbs);
+            temp.append("td").html(run.netProfit - run.costs);
+            // check attas boost
+            if(run.attas == 1){
+                temp.append("td").html("On");
+            }else{
+                temp.append("td").html("Off");
+            }
+            
         }
     }
 
-    // Draw a button to select that herb type
-    let herbButtonArea = d3.select("#run-herb-type").html(null);
-    for(let herb of listOfHerbs){
-        herbButtonArea.append("div")
-            .style("width",`calc(${100/listOfHerbs.length}% - ${listOfHerbs.length+10}px)`)
-            .attr("class","past-run-toggle-button")
-            .html(herb);
+    function drawVegaGraph(runs){
+        $.getJSON("./json/graph.json", function (graphJson) {
+            let graphData = [];
+
+            // Add the runs to the data
+            let i = 0;
+            let runningTotal = 0;
+            for(let run of runs){
+                // herb run
+                graphData.push({
+                    x: i,
+                    y: run.herbs,
+                    c: 0
+                });  
+
+                // average
+                runningTotal += run.herbs;
+                graphData.push({
+                    x: i,
+                    y: (runningTotal/(i+1)),
+                    c: 1
+                });
+
+                i++;
+
+                
+            }
+
+
+            // Calculate the scale for x axes
+            const fixedScale = [1,5,10,25,50,100];
+            let highestPossibleScale = 0;
+            let xScale = [];
+            // go though the possible options for the scale and
+            // find what's the highest one that would work 5 times
+            for(let scale of fixedScale){
+                if(runs.length/(scale*5) >= 1){
+                    highestPossibleScale = scale;
+                }
+            }
+
+            // Build the scale with a max of 15 ticks
+            for(let i = 0;i <= 15;i++){
+                if(highestPossibleScale*i <= runs.length-1){
+                    xScale.push(highestPossibleScale*i);
+                }
+            }
+
+            // Add the scale to the json
+            graphJson.axes[0].values = xScale;
+
+            // Add the data to the json
+            graphJson.data[0].values = graphData;
+
+            // calculate the width of the graph
+            graphJson.width = d3.select("#past-runs-graph").html(null).node().getBoundingClientRect().width-36;
+
+            // Add the graph to the div
+            vegaEmbed('#past-runs-graph',graphJson,{defaultStyle: false});
+
+            //console.log(JSON.stringify(graphJson));
+            
+        });
     }
 
-    // draw the past runs in a list
-    let pastRunsList = d3.select("#list-past-runs-body").html(null);
-    for(let run of pastRuns){
-        let temp = pastRunsList.append("tr");
-        temp.append("td").html(run.herbType);
-        temp.append("td").html(run.herbs);
-        temp.append("td").html(run.netProfit - run.costs);
-        if(run.attas == 1){
-            temp.append("td").html("On");
-        }else{
-            temp.append("td").html("Off");
+    function drawNumberOfPatchesButtons(runs){
+        let listOfPatchCounts = [0];
+
+        // Go through the runs and find all the unique number of patches
+        for(let run of runs){
+            if(listOfPatchCounts.find(x=>x==run.maxPatch) == undefined){
+                listOfPatchCounts.push(run.maxPatch);
+            }
         }
-        
+
+        let numberOfPatchesDiv = d3.select("#number-of-patches").html(null);
+        for(let count of listOfPatchCounts){
+            let temp = numberOfPatchesDiv.append("div")
+                .style("width",`calc(${100/listOfPatchCounts.length}% - ${listOfPatchCounts.length+10}px)`)
+                .attr("class","past-run-toggle-button")
+                .attr("id","past-run-max-count-"+count)
+                .html(count);
+    
+            // Set the onclick events
+            if(count == 0){
+                temp.on("click",onMaxPatchButton(0)).html("All");
+            }else{
+                temp.on("click",onMaxPatchButton(count));
+            }
+    
+            // Make the selected button coloured
+            if(pastRunPage.maxPatch == count){
+                temp.attr("class","past-run-toggle-button-selected");
+            }
+        }
+
+        pastRunPage.lists.max = listOfPatchCounts;
     }
 
+    function drawHerbTypeButtons(runs){
+        let listOfHerbs = ["All"];
+    
+        // Go through all runs and find the herb types
+        for(let run of runs){
+            if(listOfHerbs.find(x=>x.toLowerCase()==run.herbType.toLowerCase()) == undefined){
+                listOfHerbs.push(run.herbType);
+            }
+            
+        }
+        // Draw a button to select that herb type
+        let herbButtonArea = d3.select("#run-herb-type").html(null);
+        let i = 0;
+        for(let herb of listOfHerbs){
+            let temp = herbButtonArea.append("div")
+                .style("width",`calc(${100/listOfHerbs.length}% - ${listOfHerbs.length+10}px)`)
+                .attr("class","past-run-toggle-button")
+                .attr("id","past-run-type-"+i)
+                .on("click",onTypeButton(herb))
+                .html(herb);
+    
+            // If this herb type is the selected one, change the class to selected
+            if(herb == pastRunPage.herbType){
+                temp.attr("class","past-run-toggle-button-selected");
+            }
+            i++;
+        }
 
+        pastRunPage.lists.types = listOfHerbs;
+    }
+
+    function disableButtons(runs){
+        // Go through all runs and find the herb types
+        let listOfHerbs = ["All"];
+        for(let run of runs){
+            if(listOfHerbs.find(x=>x.toLowerCase()==run.herbType.toLowerCase()) == undefined){
+                listOfHerbs.push(run.herbType);
+            }
+        }
+        // Disable any buttons that contain 0 results
+        let i = 0;
+        for(let type of pastRunPage.lists.types){
+            if(listOfHerbs.find(x=>x.toLowerCase()==type.toLowerCase()) == undefined){
+                d3.select("#past-run-type-"+i).attr("class","past-run-toggle-button-disabled");
+            }
+            i++
+        }
+
+        // Check if runs have attas or no attas
+        let hasAttas = false;
+        let hasNonAttas = false;
+        for(let run of runs){
+            if(run.attas == 1){
+                hasAttas = true;
+            }else{
+                hasNonAttas = true;
+            }
+            // Break early for unneeded iterations
+            if(hasAttas && hasNonAttas){
+                break;
+            }
+        }
+        // Disable any buttons that contain 0 results
+        if(!hasAttas){
+            d3.select("#yes-boost-runs").attr("class","past-run-toggle-button-disabled");
+        }
+        if(!hasNonAttas){
+            d3.select("#no-boost-runs").attr("class","past-run-toggle-button-disabled");
+        }
+
+        // find all the max patch counts after filtering
+        let listOfPatchCounts = [0];
+        for(let run of runs){
+            if(listOfPatchCounts.find(x=>x==run.maxPatch) == undefined){
+                listOfPatchCounts.push(run.maxPatch);
+            }
+        }
+        // Disable any buttons that contain 0 results
+        for(let count of pastRunPage.lists.max){
+            if(listOfPatchCounts.find(x=>x==count) == undefined){
+                d3.select("#past-run-max-count-"+count).attr("class","past-run-toggle-button-disabled");
+            }
+        }
+    }
+
+    function resetAttasButtons(){
+        d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
+        d3.select("#no-boost-runs").attr("class","past-run-toggle-button");
+    }
+
+    /***********************************************************
+    ** Working Functions
+    ************************************************************/
+    function generateFilteredList(){
+        // filter the list of past runs by the given arguments
+        let temp = [];
+        for(let run of pastRunPage.pastRuns){
+            // check if type is all OR type matches given
+            if(pastRunPage.herbType == "All" || run.herbType.toLowerCase() == pastRunPage.herbType.toLowerCase()){
+                // If the boost type is all OR boost matches
+                if(pastRunPage.boostType == 2 || pastRunPage.boostType == run.attas){
+                    // if the max patch count is all OR count matches
+                    if(pastRunPage.maxPatch == 0 || pastRunPage.maxPatch == run.maxPatch){
+                        temp.push(run);
+                    }
+                }
+            }
+        }
+        return temp;
+    }
+
+    /***********************************************************
+    ** Function Returns
+    ************************************************************/
+    function onTypeButton(type){
+        return function(){
+            setHerbType(type);
+        }
+    }
+
+    function onMaxPatchButton(num){
+        return function(){
+            setMaxPatches(num);
+        }
+    }
 }
+
+function setHerbType(type){
+    pastRunPage.herbType = type;
+    setupPastRunsPage();
+}
+
+function setBoostType(number){
+    pastRunPage.boostType = number;
+    setupPastRunsPage();
+    d3.select("#all-boost-runs").attr("class","past-run-toggle-button");
+    d3.select("#no-boost-runs").attr("class","past-run-toggle-button");
+    d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
+    if(number == 0){
+        d3.select("#no-boost-runs").attr("class","past-run-toggle-button-selected");
+    }else if(number == 1){
+        d3.select("#yes-boost-runs").attr("class","past-run-toggle-button-selected");
+    }else{
+        d3.select("#all-boost-runs").attr("class","past-run-toggle-button-selected");
+    }
+}
+
+function setHerbType(type){
+    // Save the new type
+    pastRunPage.herbType = type;
+    // reload page
+    setupPastRunsPage();
+}
+
+function setMaxPatches(num){
+    pastRunPage.maxPatch = num;
+    setupPastRunsPage();
+}
+

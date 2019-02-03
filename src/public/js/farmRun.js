@@ -8,7 +8,7 @@ function getFarmPrices(){
     });
     $.getJSON("./json/herbs.json", function (json) {
         herbTable = json;
-    })
+    });
 }
 
 function setupFarmPage(){

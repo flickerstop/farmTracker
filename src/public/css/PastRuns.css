@@ -31,6 +31,18 @@
     border-radius: 25px;
 }
 
+.past-run-toggle-button-disabled{
+    float: left;
+    border: 1px solid white;
+    font-size: 15px;
+    line-height: 38px;
+    text-align: center;
+    height: 38px;
+    margin: 0px 5px;
+    border-radius: 25px;
+    opacity: 0.2;
+}
+
 .toggle-button-info{
     color: rgb(103, 103, 103);
     margin-top: 25px;
@@ -39,4 +51,11 @@
     border-top: 1px solid white;
     width: 100%;
     text-align: center;
+}
+.vega-actions{
+    display: none;
+}
+
+.past-runs-graph{
+    width: 100%;
 }

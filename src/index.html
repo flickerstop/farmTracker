@@ -100,14 +100,17 @@
             > Past Farm runs
             <----------------------------------------------------------->
             <div id="past-farm-runs" style="display: none;">
-                <h3 class="toggle-button-info">Select Your Herb Type</h3>
+                <h3 class="toggle-button-info">1. Select Your Herb Type</h3>
                 <div id="run-herb-type"></div>
-                <h3 class="toggle-button-info">Select Your Boost</h3>
+                <h3 class="toggle-button-info">2. Select Your Boost</h3>
                 <div>
-                    <div id="all-boost-runs" class="past-run-toggle-button-selected" style="width: calc(33% - 13px)">All</div>
-                    <div id="no-boost-runs" class="past-run-toggle-button" style="width: calc(33% - 13px)">None</div>
-                    <div id="yes-boost-runs" class="past-run-toggle-button" style="width: calc(33% - 13px)">Attas Plant</div>
+                    <div id="all-boost-runs" onclick="setBoostType(2)" class="past-run-toggle-button-selected" style="width: calc(33% - 13px)">All</div>
+                    <div id="no-boost-runs" onclick="setBoostType(0)" class="past-run-toggle-button" style="width: calc(33% - 13px)">None</div>
+                    <div id="yes-boost-runs" onclick="setBoostType(1)" class="past-run-toggle-button" style="width: calc(33% - 13px)">Attas Plant</div>
                 </div>
+                <h3 class="toggle-button-info">3. Select Number of Patches</h3>
+                <div id="number-of-patches"></div>
+                <div id="past-runs-graph"></div>
                 <div id="list-past-runs">
                     <table>
                         <thead>
@@ -176,9 +179,6 @@
         getFarmPrices();
         
     });
-
-    //NOTE how to use vega
-    //vegaEmbed('#past-farm-runs','https://vega.github.io/vega/examples/bar-chart.vg.json',{defaultStyle: false});
 
     /**
      * All of these functions are used as onclick events
