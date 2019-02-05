@@ -31,7 +31,7 @@ function setupPastRunsPage(){
 
     let filteredRuns = generateFilteredList();
 
-    resetAttasButtons();
+    drawAttasButtons();
 
     // find all the types of herbs that were farmed
     drawHerbTypeButtons(pastRunPage.pastRuns)
@@ -45,6 +45,15 @@ function setupPastRunsPage(){
 
     if(filteredRuns.length == 0){
         //TODO delete the graph and list and show that no runs of this type are done
+        d3.select("#list-past-runs-body").html(null);
+        //d3.select("#past-runs-graph2").html(null);
+        pastRunPage.chart.destroy();
+        pastRunPage.chart = null;
+        d3.select("#past-run-left-info").html(null);
+        d3.select("#past-run-left-stats").html(null);
+        d3.select("#past-run-right-info").html(null);
+        d3.select("#past-run-right-stats").html(null);
+
     }else{
         //drawVegaGraph(filteredRuns);
         drawChartJSGraph(filteredRuns);
@@ -153,7 +162,7 @@ function setupPastRunsPage(){
 
             // average
             runningTotal += run.herbs;
-            avgArray.push(runningTotal/(i+1));
+            avgArray.push(roundToTwoDecimal(runningTotal/(i+1)));
             temp.push(i);
             i++;
         }
@@ -167,7 +176,7 @@ function setupPastRunsPage(){
                     datasets: [{
                         label: 'Herbs Harvested',
                         data: dataArray,
-                        backgroundColor: 'rgba(96, 64, 0,0.4)',
+                        //backgroundColor: 'rgba(96, 64, 0,0.4)',
                         borderColor: '#ffab00',
                         borderWidth: 1,
                         pointRadius: 1
@@ -217,7 +226,7 @@ function setupPastRunsPage(){
             pastRunPage.chart.data.datasets = [{
                 label: 'Herbs Harvested',
                 data: dataArray,
-                backgroundColor: 'rgba(96, 64, 0,0.4)',
+                //backgroundColor: 'rgba(96, 64, 0,0.4)',
                 borderColor: '#ffab00',
                 borderWidth: 1,
                 pointRadius: 1
@@ -354,9 +363,18 @@ function setupPastRunsPage(){
         }
     }
 
-    function resetAttasButtons(){
-        d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
+    function drawAttasButtons(){
+        d3.select("#all-boost-runs").attr("class","past-run-toggle-button");
         d3.select("#no-boost-runs").attr("class","past-run-toggle-button");
+        d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
+
+        if(pastRunPage.boostType == 0){
+            d3.select("#no-boost-runs").attr("class","past-run-toggle-button-selected");
+        }else if(pastRunPage.boostType == 1){
+            d3.select("#yes-boost-runs").attr("class","past-run-toggle-button-selected");
+        }else{
+            d3.select("#all-boost-runs").attr("class","past-run-toggle-button-selected");
+        }
     }
 
     function drawRunStats(runs){
@@ -524,16 +542,6 @@ function setHerbType(type){
 function setBoostType(number){
     pastRunPage.boostType = number;
     setupPastRunsPage();
-    d3.select("#all-boost-runs").attr("class","past-run-toggle-button");
-    d3.select("#no-boost-runs").attr("class","past-run-toggle-button");
-    d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
-    if(number == 0){
-        d3.select("#no-boost-runs").attr("class","past-run-toggle-button-selected");
-    }else if(number == 1){
-        d3.select("#yes-boost-runs").attr("class","past-run-toggle-button-selected");
-    }else{
-        d3.select("#all-boost-runs").attr("class","past-run-toggle-button-selected");
-    }
 }
 
 function setHerbType(type){

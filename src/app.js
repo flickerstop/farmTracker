@@ -57,12 +57,30 @@ app.route('/get/farmRun/runs/:key').get((req, res) => {
     });
 });
 
+app.route('/get/settings/:key').get((req, res) => {
+    const requestedKey = req.params['key'];
+    request(apiServer+"/get/settings/"+requestedKey).then((settings) =>{
+        res.send(settings);
+    }).catch((err)=>{
+        res.send(err);
+    });
+});
+
+
 /***********************************************************
 ** POST requests
 ************************************************************/
 
 app.route("/post/farmRun").post(function(req, res) {
     axios.post(apiServer+"/post/farmRun",req.body).then((reply) => {
+        res.send(reply.data);
+    }).catch((error) =>{
+        res.sendStatus(500);
+    });
+});
+
+app.route("/post/settings").post(function(req, res) {
+    axios.post(apiServer+"/post/settings",req.body).then((reply) => {
         res.send(reply.data);
     }).catch((error) =>{
         res.sendStatus(500);

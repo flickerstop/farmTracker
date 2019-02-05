@@ -1,6 +1,9 @@
 <html>
     <head>
+        <title id="windowTitle">Farm Tracker</title>
+        <!-- TODO add favicon-->
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <link rel="shortcut icon" type="image/png" href="./images/favicon.ico"/>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="/js/farmRun.js"></script>
         <script src="/js/webStorage.js"></script>
@@ -20,7 +23,7 @@
         <----------------------------------------------------------->
         <div id="topBar">
             <div id="topBar-left"></div>
-            <div id="topBar-middle">middle</div>
+            <div id="topBar-middle" onclick="stopFarmAlarm()"></div>
             <div id="topBar-right">
                 <div class="icon" onclick="stateSwitcher(1)" style='background-image:url("./images/home.png")'></div>
                 <div class="icon" onclick="stateSwitcher(2)" style='background-image:url("./images/Farming_icon.png")'></div>
@@ -44,7 +47,7 @@
             <----------------------------------------------------------->
             <div id="track-farm-run" style="display: none;">
                 <h1 id="farm-run-timer">00:00:00</h1>
-                <div id="stop-run-button">Stop Farm Run</div>
+                <div id="stop-run-button" onclick="stopFarmAlarm()">Stop Farm Run</div>
                 <div id="farm-run-info">
                     <div>Currently running <span id="current-farm-herb">Ranarr Weeds</span> with <span id="current-numb-patches">9</span> patches</div>
                     <div id="attas-boost" style="color: rgb(192, 57, 43);">No Attas boost</div>
@@ -95,7 +98,7 @@
                     </div>
                 </div>
                 <div id="save-button" onclick="saveFarmData()">Save Run</div>
-                <div id="farm-run-error" style="display: none;"></div>
+                <div id="farm-run-error" class="text-error" style="display: none;"></div>
             </div>
             <!----------------------------------------------------------
             > Past Farm runs
@@ -183,7 +186,9 @@
                     </div>
                 </div>
                 <!-- Save Settings -->
-                <div id="save-button" onclick="saveSettings();stateSwitcher(1);">Save Settings</div>
+                <div id="save-button" onclick="saveSettings();">Save Settings</div>
+                <div id="settings-error" class="text-error"></div>
+                <div id="settings-note" class="text-note"></div>
             </div>
         </div>
     </body>
@@ -192,12 +197,18 @@
 
 <script>
 
-
+    var globalClock = null;
     $(document).ready(function () {
         load();
         getVersionNumber();
         getFarmPrices();
-        
+        globalClock = setInterval(farmRunClock, 500);
+
+        getSettingsFromServer(saveData.key).then((res)=>{
+            console.log(res);
+        }).catch((err)=>{
+            console.log(err);
+        });
     });
 
     /**

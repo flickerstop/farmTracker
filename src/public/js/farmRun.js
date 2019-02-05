@@ -1,6 +1,7 @@
 
 let prices = null;
 let herbTable = null;
+var audio = new Audio("./audio/alarm.wav");
 
 function getFarmPrices(){
     $.get("/get/farmRun/prices", function (data) {
@@ -34,6 +35,17 @@ function setupFarmPage(){
 }
 
 function saveFarmData(){
+    d3.select("#farm-run-error").html(null).style('display', "none");
+
+    // Check if number of herbs has been filled out
+    if($("#numberOfHerbs").val() == ""){
+        d3.select("#numberOfHerbs")
+            .style("background-color","#902929")
+            .transition().duration(2000)
+            .style("background-color","rgb(39, 39, 39)");
+        return;
+    }
+
     // Get the data from the webpage
     let numHerbs = parseInt($("#numberOfHerbs").val());
     let numDead = parseInt($("#numberOfDeadPatches").val());
@@ -95,10 +107,32 @@ function saveFarmData(){
     $.post("/post/farmRun", toSend,function( data ) {
         if(data == "invalid_key"){
             d3.select("#farm-run-error").html("INVALID KEY!").style('display', null);
-        }else{
+        }else if(data == "saved"){
             setupFarmPage();
-            //TODO start the countdown
-            //NOTE if unable to push to server, maybe store in local storage and try to push later?
+
+            saveData.onRun = true;
+            saveData.lastRun = Date.now();
+            save("Farm run");
+
+            // Change the button to show saved
+            d3.select("#save-button")
+            .html("Saved")
+            .style("background-color","#9b59b6")
+            .transition().duration(2000)
+            .style("background-color","#0d6330")
+            .style("color","#0d6330")
+            .on("end", function() { d3.select("#save-button").html("Save Run").transition().duration(500).style("color","white")});
+            
+            // Update the new settings on the server
+            setSettingsOnServer().then((res)=>{
+                console.log(res);
+            }).catch((err) => {
+                d3.select("#farm-run-error").html(err);
+            });
+    
+        }else{
+            d3.select("#farm-run-error").html("Something went wrong! :(").style('display', null);
+            //TODO if unable to push to server, maybe store in local storage and try to push later?
         }
         
     });
@@ -106,4 +140,56 @@ function saveFarmData(){
     function find(id){
         return prices.find(x=> x.id == id).sell;
     }
+}
+
+function farmRunClock(){
+    var rightNow = new Date().getTime();
+
+    if(saveData.onRun == true){
+        var endTime = saveData.lastRun+4800000;
+
+        if(endTime < rightNow && audio.duration > 0){
+            if(saveData.remind){
+                audio.play();
+            }
+            d3.select("#farm-run-timer").html("00:00:00");
+            d3.select("#topBar-middle").html("00:00:00");
+            d3.select("#windowTitle").html("Farm Tracker");
+        }else{
+            d3.select("#farm-run-timer").html(msToTime(endTime-rightNow));
+            d3.select("#topBar-middle").html(msToTime(endTime-rightNow));
+            d3.select("#windowTitle").html(msToTime(endTime-rightNow));
+        }
+        
+    }else{
+        d3.select("#farm-run-timer").html("00:00:00");
+        d3.select("#topBar-middle").html("00:00:00");
+        d3.select("#windowTitle").html("Farm Tracker");
+    }
+
+
+    // Convert milliseconds to readable time
+    function msToTime(duration) {
+        //let milliseconds = parseInt((duration%1000)/100);
+        let seconds = parseInt((duration/1000)%60);
+        let minutes = parseInt((duration/(1000*60))%60);
+        let hours = parseInt((duration/(1000*60*60))%24);
+
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+        return hours + ":" + minutes + ":" + seconds;
+    }
+}
+
+function stopFarmAlarm(){
+    try{
+        audio.pause();
+        audio.currentTime = 0;
+    }catch(err){
+
+    }
+    saveData.onRun = false;
+    save();
 }

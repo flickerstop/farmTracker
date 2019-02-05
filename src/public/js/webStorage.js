@@ -10,7 +10,7 @@ const defaultSave = {
     runs:[],
     herbType: null,
     numberOfPatches:0,
-    key: ""
+    key: null
 }
 let versionNumber = "v?.?.?";    // Current version number
 let saveData = null;            // variable to hold save data
@@ -48,6 +48,11 @@ function load() {
     } else {
         window.alert("Web Storage is not supported!");
     }
+}
+
+function reset(){
+    saveData = defaultSave;
+    save("save reset");
 }
 
 /***********************************************************
