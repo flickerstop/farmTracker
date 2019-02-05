@@ -56,6 +56,20 @@
     display: none;
 }
 
-.past-runs-graph{
+.past-runs-graph,.past-runs-graph2{
     width: 100%;
+}
+
+#farmRunTable{
+    width: 75%;
+    margin: 0px auto;
+}
+
+#farmRunTable tr{
+    text-align: center;
+}
+
+#farmRunTable tr:hover{
+    background-color: #ffab00;
+    color: black;
 }

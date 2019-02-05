@@ -7,7 +7,8 @@ let pastRunPage = {
     lists:{
         types:[],
         max:[]
-    }
+    },
+    chart:null
 }
 
 function getPastRuns(){
@@ -38,15 +39,17 @@ function setupPastRunsPage(){
     // number of patches buttons
     drawNumberOfPatchesButtons(pastRunPage.pastRuns);
 
-
+    
     
     
 
     if(filteredRuns.length == 0){
         //TODO delete the graph and list and show that no runs of this type are done
     }else{
-        drawVegaGraph(filteredRuns);
+        //drawVegaGraph(filteredRuns);
+        drawChartJSGraph(filteredRuns);
         drawRunList(filteredRuns);
+        drawRunStats(filteredRuns);
     }
     
     disableButtons(filteredRuns);
@@ -60,13 +63,13 @@ function setupPastRunsPage(){
             let temp = pastRunsList.append("tr");
             temp.append("td").html(run.herbType);
             temp.append("td").html(run.herbs);
-            temp.append("td").html(run.netProfit - run.costs);
+            temp.append("td").html((run.netProfit - run.costs).toLocaleString()).style("text-align","right");
             // check attas boost
-            if(run.attas == 1){
-                temp.append("td").html("On");
-            }else{
-                temp.append("td").html("Off");
-            }
+            // if(run.attas == 1){
+            //     temp.append("td").html("On");
+            // }else{
+            //     temp.append("td").html("Off");
+            // }
             
         }
     }
@@ -134,6 +137,102 @@ function setupPastRunsPage(){
             //console.log(JSON.stringify(graphJson));
             
         });
+    }
+
+    function drawChartJSGraph(runs){
+        var ctx = document.getElementById("past-runs-graph2");
+
+        let dataArray = [];
+        let avgArray = [];
+        let i = 0;
+        let runningTotal = 0;
+        let temp = [];
+        for(let run of runs){
+            // herb run
+            dataArray.push(run.herbs);  
+
+            // average
+            runningTotal += run.herbs;
+            avgArray.push(runningTotal/(i+1));
+            temp.push(i);
+            i++;
+        }
+
+        // Check if a chart is already draw
+        if(pastRunPage.chart == null){
+            pastRunPage.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: temp,
+                    datasets: [{
+                        label: 'Herbs Harvested',
+                        data: dataArray,
+                        backgroundColor: 'rgba(96, 64, 0,0.4)',
+                        borderColor: '#ffab00',
+                        borderWidth: 1,
+                        pointRadius: 1
+                    },{
+                        label: 'Avg. Harvest',
+                        data: avgArray,
+                        backgroundColor: 'rgba(90, 0, 102,0.4)',
+                        borderColor: '#e100ff',
+                        borderWidth: 1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:false,
+                                fontColor: "#ffffff",
+                                fontSize: 10
+                            },
+                            gridLines: {
+                                display: false,
+                            },
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                maxTicksLimit:15,
+                                fontColor: "#ffffff",
+                                fontSize: 10,
+                                maxRotation: 0,
+                                minRotation: 0
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                    elements: {
+                        line: {
+                            tension: 0, // disables bezier curves
+                        }
+                    }
+                }
+            });
+        }else{
+            pastRunPage.chart.data.labels = temp;
+            pastRunPage.chart.data.datasets = [{
+                label: 'Herbs Harvested',
+                data: dataArray,
+                backgroundColor: 'rgba(96, 64, 0,0.4)',
+                borderColor: '#ffab00',
+                borderWidth: 1,
+                pointRadius: 1
+            },{
+                label: 'Avg. Harvest',
+                data: avgArray,
+                backgroundColor: 'rgba(90, 0, 102,0.4)',
+                borderColor: '#e100ff',
+                borderWidth: 1,
+                pointRadius: 0
+            }];
+            pastRunPage.chart.update();
+        }
+
+        
     }
 
     function drawNumberOfPatchesButtons(runs){
@@ -258,6 +357,126 @@ function setupPastRunsPage(){
     function resetAttasButtons(){
         d3.select("#yes-boost-runs").attr("class","past-run-toggle-button");
         d3.select("#no-boost-runs").attr("class","past-run-toggle-button");
+    }
+
+    function drawRunStats(runs){
+        // Reset divs
+        d3.select("#past-run-left-info").html(null);
+        d3.select("#past-run-left-stats").html(null);
+        d3.select("#past-run-right-info").html(null);
+        d3.select("#past-run-right-stats").html(null);
+
+
+        const leftSideInfo = [
+            "Number of Runs",
+            "Number of Herbs",
+            "Avg. Herbs Collected",
+            "Avg. Herbs per Seed",
+            "Number of Seeds Used",
+            "Most Herbs Collected",
+            "Least Herbs Collected",
+            "Number of Dead",
+            "Chance of Death",
+            "Successful Resurrections",
+            "Failed Resurrections",
+            "Resurrection Chance",
+            "Number of Sick"
+        ];
+        const rightSideInfo = [
+            "Net Profit",
+            "Total Costs",
+            "Profit",
+            "Avg. Profit per Run",
+            "Net Profit per Seed"
+        ];
+
+        // Add left side text
+        for(let stat of leftSideInfo){
+            d3.select("#past-run-left-info").append("div").html(stat+":");
+        }
+        let leftSideStatsDiv = d3.select("#past-run-left-stats");
+
+        // Add right side text
+        for(let stat of rightSideInfo){
+            d3.select("#past-run-right-info").append("div").html(stat+":");
+        }
+        let rightSideStatsDiv = d3.select("#past-run-right-stats");
+
+        // Loop through all runs
+        let numberOfHerbs = 0;
+        let numberOfSeeds = 0;
+        let highestCount = 0;
+        let lowestCount = 99999;
+        let numberOfDead = 0;
+        let numberOfPatches = 0;
+        let numberOfPassRes = 0;
+        let numberOfFailRes = 0;
+        let numberOfCured = 0;
+        
+        let netProfit = 0;
+        let costs = 0;
+
+        for(let run of runs){
+            numberOfHerbs += run.herbs;
+            numberOfSeeds += run.maxPatch - run.resPass - run.curedPatch;
+            numberOfDead += run.deadPatch;
+            numberOfPatches += run.maxPatch;
+            numberOfPassRes += run.resPass;
+            numberOfFailRes += run.resFail;
+            numberOfCured += run.curedPatch;
+
+            netProfit += run.netProfit;
+            costs += run.costs;
+
+
+            // Most Herbs
+            if(run.herbs > highestCount){
+                highestCount = run.herbs;
+            }
+            // Lowest Herbs
+            if(run.herbs < lowestCount){
+                lowestCount = run.herbs;
+            }
+        }
+
+        // Number of Runs
+        leftSideStatsDiv.append("div").html(runs.length.toLocaleString());
+        // Number of Herbs
+        leftSideStatsDiv.append("div").html(numberOfHerbs.toLocaleString());
+        // Avg. Herbs Collected
+        leftSideStatsDiv.append("div").html(roundToOneDecimal(numberOfHerbs/runs.length).toLocaleString());
+        // Avg. Herbs per Seed
+        leftSideStatsDiv.append("div").html(roundToOneDecimal(numberOfHerbs/numberOfSeeds).toLocaleString());
+        // Number of Seeds Used
+        leftSideStatsDiv.append("div").html(numberOfSeeds.toLocaleString());
+        // Most Herbs Collected
+        leftSideStatsDiv.append("div").html(highestCount.toLocaleString());
+        // Least Herbs Collected
+        leftSideStatsDiv.append("div").html(lowestCount.toLocaleString());
+        // Number of Dead
+        leftSideStatsDiv.append("div").html(numberOfDead.toLocaleString());
+        // Chance of Death
+        leftSideStatsDiv.append("div").html(roundToTwoDecimal(numberOfDead/numberOfPatches*100).toLocaleString()+"%");
+        // Successful Resurrections
+        leftSideStatsDiv.append("div").html(numberOfPassRes.toLocaleString());
+        // Failed Resurrections
+        leftSideStatsDiv.append("div").html(numberOfFailRes.toLocaleString());
+        // Resurrection Chance
+        leftSideStatsDiv.append("div").html(roundToTwoDecimal(numberOfPassRes/(numberOfPassRes+numberOfFailRes)*100).toLocaleString()+"%");
+        // Number of Sick
+        leftSideStatsDiv.append("div").html(numberOfCured.toLocaleString());
+
+
+        // Net Profit
+        rightSideStatsDiv.append("div").html(netProfit.toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        // Total Costs
+        rightSideStatsDiv.append("div").html(costs.toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        // Profit
+        rightSideStatsDiv.append("div").html((netProfit - costs).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        // Avg. Profit per Run
+        rightSideStatsDiv.append("div").html(roundToOneDecimal((netProfit - costs)/runs.length).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        // Net Profit per Seed
+        rightSideStatsDiv.append("div").html(roundToOneDecimal(netProfit/numberOfSeeds).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
     }
 
     /***********************************************************

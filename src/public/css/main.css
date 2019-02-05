@@ -113,6 +113,10 @@
     width: 100%;
     margin-top: 5px;
 }
+.two-side-row-full{
+    width: 100%;
+    margin-top: 5px;
+}
 .left-side, .right-side{
     width: calc(50% - 5px);
     padding-right: 5px;
@@ -120,6 +124,15 @@
 }
 .left-side{
     text-align: right;
+}
+#past-run-left-info div,#past-run-right-info div{
+    padding-top: 5px;
+}
+
+#past-run-left-stats div,#past-run-right-stats div{
+    color: rgb(80, 200, 255);
+    padding-top: 5px;
+    text-align: left;
 }
 
 /***********************************************************

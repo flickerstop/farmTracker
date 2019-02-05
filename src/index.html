@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="/css/pastRuns.css">
         <script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/vega-embed@3.24.2"></script>
+        <script src="/js/external/Chart.js"></script>
     </head>
     <body id="body">
         <!----------------------------------------------------------
@@ -111,13 +112,32 @@
                 <h3 class="toggle-button-info">3. Select Number of Patches</h3>
                 <div id="number-of-patches"></div>
                 <div id="past-runs-graph"></div>
+                <canvas id="past-runs-graph2"></canvas>
+                <!-- Run Info -->
+                <h3 class="toggle-button-info">Run Stats</h3>
+                <div class="two-side-row-full">
+                    <div class="left-side">
+                        <div class="two-side-row-full">
+                            <div class="left-side" id="past-run-left-info"></div>
+                            <div class="right-side" id="past-run-left-stats"></div>
+                        </div>
+                    </div>
+                    <div class="right-side">
+                        <div class="two-side-row-full">
+                            <div class="left-side" id="past-run-right-info"></div>
+                            <div class="right-side" id="past-run-right-stats"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- List of runs -->
+                <h3 class="toggle-button-info">List of all the runs</h3>
                 <div id="list-past-runs">
-                    <table>
+                    <table id="farmRunTable">
                         <thead>
                             <th>Type</th>
                             <th>Number of Herbs</th>
                             <th>Profit</th>
-                            <th>Attas</th>
+                            <!-- <th>Attas</th> -->
                         </thead>
                         <tbody id="list-past-runs-body">
 
@@ -244,5 +264,18 @@
         }
         // set the new value to 1 greater than the old
         $("#" + divID).val(currentValue - 1);
+    }
+
+    /***********************************************************
+    ** Global Functions
+    ************************************************************/
+    // Round to two decimal places
+    function roundToTwoDecimal(number){
+        return (Math.round(number*100))/100;
+    }
+
+    // Round to one decimal places
+    function roundToOneDecimal(number){
+        return (Math.round(number*10))/10;
     }
 </script>
