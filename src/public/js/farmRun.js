@@ -192,4 +192,5 @@ function stopFarmAlarm(){
     }
     saveData.onRun = false;
     save();
+    setSettingsOnServer();
 }
