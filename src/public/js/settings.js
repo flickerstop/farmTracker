@@ -1,3 +1,5 @@
+var alarmTestAudio = null;
+
 function setupSettingsPage(){
     
     d3.select("#settings-error").html(null);
@@ -26,6 +28,28 @@ function setupSettingsPage(){
             temp.attr("selected","selected");
         }
     }
+
+    // remind
+    if(saveData.remind){
+        d3.select("#settings-remind-off").attr("class","toggle-button-off");
+        d3.select("#settings-remind-on").attr("class","toggle-button-on");
+    }else{
+        d3.select("#settings-remind-off").attr("class","toggle-button-on");
+        d3.select("#settings-remind-on").attr("class","toggle-button-off");
+    }
+
+    // alarm timer
+    if(saveData.alarmTimer){
+        d3.select("#settings-alarm-timer-off").attr("class","toggle-button-off");
+        d3.select("#settings-alarm-timer-on").attr("class","toggle-button-on");
+    }else{
+        d3.select("#settings-alarm-timer-off").attr("class","toggle-button-on");
+        d3.select("#settings-alarm-timer-on").attr("class","toggle-button-off");
+    }
+
+    // select alarm type
+    d3.select('#settings-alarm-type').property('value', saveData.alarmSound);
+
 }
 
 function saveSettings(){
@@ -55,6 +79,9 @@ function saveSettings(){
     // select herb type
     saveData.herbType = $("#settings-herb-type").val();
 
+    // alarm sound
+    saveData.alarmSound = parseInt($("#settings-alarm-type").val());
+
     save("Settings page");
     setSettingsOnServer().then((res)=>{
         console.log(res);
@@ -73,6 +100,30 @@ function attasBoostToggle(status){
         d3.select("#settings-attas-off").attr("class","toggle-button-off");
         d3.select("#settings-attas-on").attr("class","toggle-button-on");
         saveData.attas = true;
+    }
+}
+
+function alarmRemindToggle(status){
+    if(status == 0){
+        d3.select("#settings-remind-off").attr("class","toggle-button-on");
+        d3.select("#settings-remind-on").attr("class","toggle-button-off");
+        saveData.remind = false;
+    }else{
+        d3.select("#settings-remind-off").attr("class","toggle-button-off");
+        d3.select("#settings-remind-on").attr("class","toggle-button-on");
+        saveData.remind = true;
+    }
+}
+
+function alarmTimerToggle(status){
+    if(status == 0){
+        d3.select("#settings-alarm-timer-off").attr("class","toggle-button-on");
+        d3.select("#settings-alarm-timer-on").attr("class","toggle-button-off");
+        saveData.alarmTimer = false;
+    }else{
+        d3.select("#settings-alarm-timer-off").attr("class","toggle-button-off");
+        d3.select("#settings-alarm-timer-on").attr("class","toggle-button-on");
+        saveData.alarmTimer = true;
     }
 }
 
@@ -95,6 +146,8 @@ function getSettingsFromServer(key){
                 saveData.numberOfPatches = json.numberOfPatches;
                 saveData.onRun = json.onRun;
                 saveData.remind = json.remind;
+                saveData.alarmTimer = json.alarmTimer;
+                saveData.alarmSound = json.alarmSound;
                 save("Settings from server");
                 resolve("updated");
             }
@@ -112,7 +165,9 @@ function setSettingsOnServer(){
             herbType: saveData.herbType,
             lastRun: saveData.lastRun,
             remind: saveData.remind,
-            onRun: saveData.onRun
+            onRun: saveData.onRun,
+            alarmTimer: saveData.alarmTimer,
+            alarmSound: saveData.alarmSound
         }
         $.post("/post/settings", toSend,function( data ) {
             if(data == "invalid_key"){
@@ -125,4 +180,30 @@ function setSettingsOnServer(){
             
         });
     });
+}
+
+function testAlarm(){
+    // Try to stop the alarm if it's running
+    stopTestAlarm();
+
+    let alarmType = $("#settings-alarm-type").val();
+
+    if(parseInt(alarmType) <= 1){
+        alarmTestAudio = new Audio("./audio/"+alarmType+".wav");
+    }else{
+        alarmTestAudio = new Audio("./audio/"+alarmType+".mp3");
+    }
+    alarmTestAudio.loop = true;
+    alarmTestAudio.volume = 0.5;
+    alarmTestAudio.play();
+}
+
+function stopTestAlarm(){
+    try{
+        alarmTestAudio.pause();
+        alarmTestAudio.currentTime = 0;
+        audio = null;
+    }catch(err){
+        // Alarm not playing
+    }
 }

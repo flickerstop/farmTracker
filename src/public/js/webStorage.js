@@ -10,7 +10,9 @@ const defaultSave = {
     runs:[],
     herbType: null,
     numberOfPatches:0,
-    key: null
+    key: null,
+    alarmType: "0",
+    alarmTimer: false
 }
 let versionNumber = "v?.?.?";    // Current version number
 let saveData = null;            // variable to hold save data
@@ -54,6 +56,7 @@ function reset(){
     saveData = defaultSave;
     save("save reset");
 }
+
 
 /***********************************************************
 ** Check if mobile

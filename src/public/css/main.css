@@ -275,3 +275,41 @@ input[type=number]::-webkit-outer-spin-button {
     text-align: center;
     width: 100%;
 }
+
+/***********************************************************
+** Buttons
+************************************************************/
+.green-button, .red-button{
+    border: 1px solid white;
+    color: white;
+    height: 43px;
+    line-height: 45px;
+    width: 100px;
+    text-align: center;
+}
+
+.green-button{
+    background-color: #10ac84;
+}
+
+.red-button{
+    background-color: #ee5253;
+}
+
+.green-button:hover,.red-button:hover{
+    border: 1px solid black;
+    color: black;
+    cursor: pointer;
+}
+
+.green-button:hover{
+    background-color: #1dd1a1;
+}
+
+.red-button:hover{
+    background-color: #ff6b6b;
+}
+
+.green-button:active,.red-button:active{
+    background-color: #54a0ff;
+}

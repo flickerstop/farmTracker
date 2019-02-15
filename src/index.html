@@ -185,6 +185,47 @@
                         </select>
                     </div>
                 </div>
+                <!-- Alarm -->
+                <div class="two-side-row">
+                    <div class="left-side">Run Finished Alarm:</div>
+                    <div class="right-side">
+                        <div class="toggle-button-off" onclick="alarmRemindToggle(1)" id="settings-remind-on">ON</div>
+                        <div class="toggle-button-off" onclick="alarmRemindToggle(0)" id="settings-remind-off">OFF</div>
+                    </div>
+                </div>
+                <!-- Stop Timer -->
+                <div class="two-side-row">
+                    <div class="left-side">Stop Alarm After 30 seconds:</div>
+                    <div class="right-side">
+                        <div class="toggle-button-off" onclick="alarmTimerToggle(1)" id="settings-alarm-timer-on">ON</div>
+                        <div class="toggle-button-off" onclick="alarmTimerToggle(0)" id="settings-alarm-timer-off">OFF</div>
+                    </div>
+                </div>
+                <!-- Alarm Select -->
+                <div class="two-side-row">
+                    <div class="left-side">Alarm Sound:</div>
+                    <div class="right-side">
+                        <select id="settings-alarm-type" value="0"> 
+                            <option value="0">Watch Alarm</option>
+                            <option value="1">Fast Single Tone</option>
+                            <option value="2">Loud Soft Alarm</option>
+                            <option value="3">Birds with Soft Alarm</option>
+                            <option value="4">Soft Alarm 1</option>
+                            <option value="5">Soft Alarm 2</option>
+                            <option value="6">Soft Alarm 3</option>
+                            <option value="7">Jazzy Alarm</option>
+                            <option value="8">Windows 10 Alarm</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="two-side-row">
+                    <div class="left-side">
+                        <div onclick="testAlarm()" class="green-button" style="margin-left:auto">Play Alarm</div>
+                    </div>
+                    <div class="right-side">
+                        <div onclick="stopTestAlarm()" class="red-button">Stop Alarm</div>
+                    </div> 
+                </div>
                 <!-- Save Settings -->
                 <div id="save-button" onclick="saveSettings();">Save Settings</div>
                 <div id="settings-error" class="text-error"></div>

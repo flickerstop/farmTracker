@@ -1,7 +1,8 @@
 
 let prices = null;
 let herbTable = null;
-var audio = new Audio("./audio/alarm.wav");
+let farmRunAlarm = null;
+let farmRunAlarmStartTime = null;
 
 function getFarmPrices(){
     $.get("/get/farmRun/prices", function (data) {
@@ -148,13 +149,41 @@ function farmRunClock(){
     if(saveData.onRun == true){
         var endTime = saveData.lastRun+4800000;
 
-        if(endTime < rightNow && audio.duration > 0){
+        if(endTime < rightNow && farmRunAlarm == null){
             if(saveData.remind){
-                audio.play();
+                if(parseInt(saveData.alarmSound) <= 1){
+                    farmRunAlarm = new Audio("./audio/"+saveData.alarmSound+".wav");
+                }else{
+                    farmRunAlarm = new Audio("./audio/"+saveData.alarmSound+".mp3");
+                }
+                farmRunAlarm.loop = true;
+                farmRunAlarm.volume = 0.5;
+                farmRunAlarmStartTime = Date.now();
+                farmRunAlarm.play().catch((e)=>{
+                    //console.log(e.message);
+                    // Fails if user doesn't interact with the document
+                    farmRunAlarm = null;
+                    farmRunAlarmStartTime = null;
+                });
+                
+                
             }
             d3.select("#farm-run-timer").html("00:00:00");
             d3.select("#topBar-middle").html("00:00:00");
             d3.select("#windowTitle").html("Farm Tracker");
+        }else if(farmRunAlarm != null){
+            d3.select("#farm-run-timer").html("00:00:00");
+            d3.select("#topBar-middle").html("00:00:00");
+            d3.select("#windowTitle").html("Run is over!");  
+
+            // If it's been past 30 minutes, pause alarm
+            if(Date.now() >= (farmRunAlarmStartTime+30000) && saveData.alarmTimer){
+                try{
+                    farmRunAlarm.pause();
+                }catch(err){
+            
+                }
+            }
         }else{
             d3.select("#farm-run-timer").html(msToTime(endTime-rightNow));
             d3.select("#topBar-middle").html(msToTime(endTime-rightNow));
@@ -185,8 +214,9 @@ function farmRunClock(){
 
 function stopFarmAlarm(){
     try{
-        audio.pause();
-        audio.currentTime = 0;
+        farmRunAlarm.pause();
+        farmRunAlarm.currentTime = 0;
+        farmRunAlarm = null;
     }catch(err){
 
     }
