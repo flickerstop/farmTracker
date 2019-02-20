@@ -401,7 +401,7 @@ function setupPastRunsPage(){
             "Number of Sick"
         ];
         const rightSideInfo = [
-            "Net Profit",
+            "Income",
             "Total Costs",
             "Profit",
             "Avg. Profit per Run",

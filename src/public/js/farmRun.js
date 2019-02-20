@@ -46,6 +46,7 @@ function saveFarmData(){
             .style("background-color","rgb(39, 39, 39)");
         return;
     }
+    stopFarmAlarm();
 
     // Get the data from the webpage
     let numHerbs = parseInt($("#numberOfHerbs").val());
