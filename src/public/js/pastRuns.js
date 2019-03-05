@@ -443,9 +443,9 @@ function setupPastRunsPage(){
         // Number of days tracked
         rightSideStatsDiv.append("div").html(Math.round(daysRun));
         // Avg. Runs per day
-        rightSideStatsDiv.append("div").html(roundToTwoDecimal(daysRun/runs.length).toLocaleString());
+        rightSideStatsDiv.append("div").html(roundToTwoDecimal(runs.length/daysRun).toLocaleString());
         // Profit per day
-        rightSideStatsDiv.append("div").html(roundToTwoDecimal((daysRun/runs.length)*((netProfit - costs)/runs.length)).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        rightSideStatsDiv.append("div").html(roundToTwoDecimal((runs.length/daysRun)*((netProfit - costs)/runs.length)).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
     }
 
     /***********************************************************
