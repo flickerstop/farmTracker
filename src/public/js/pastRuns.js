@@ -73,6 +73,7 @@ function setupPastRunsPage(){
             temp.append("td").html(run.herbType);
             temp.append("td").html(run.herbs);
             temp.append("td").html((run.netProfit - run.costs).toLocaleString()).style("text-align","right");
+            temp.append("td").html(new Date(parseInt(run.time)).toDateString());
             // check attas boost
             // if(run.attas == 1){
             //     temp.append("td").html("On");
@@ -81,71 +82,6 @@ function setupPastRunsPage(){
             // }
             
         }
-    }
-
-    function drawVegaGraph(runs){
-        $.getJSON("./json/graph.json", function (graphJson) {
-            let graphData = [];
-
-            // Add the runs to the data
-            let i = 0;
-            let runningTotal = 0;
-            for(let run of runs){
-                // herb run
-                graphData.push({
-                    x: i,
-                    y: run.herbs,
-                    c: 0
-                });  
-
-                // average
-                runningTotal += run.herbs;
-                graphData.push({
-                    x: i,
-                    y: (runningTotal/(i+1)),
-                    c: 1
-                });
-
-                i++;
-
-                
-            }
-
-
-            // Calculate the scale for x axes
-            const fixedScale = [1,5,10,25,50,100];
-            let highestPossibleScale = 0;
-            let xScale = [];
-            // go though the possible options for the scale and
-            // find what's the highest one that would work 5 times
-            for(let scale of fixedScale){
-                if(runs.length/(scale*5) >= 1){
-                    highestPossibleScale = scale;
-                }
-            }
-
-            // Build the scale with a max of 15 ticks
-            for(let i = 0;i <= 15;i++){
-                if(highestPossibleScale*i <= runs.length-1){
-                    xScale.push(highestPossibleScale*i);
-                }
-            }
-
-            // Add the scale to the json
-            graphJson.axes[0].values = xScale;
-
-            // Add the data to the json
-            graphJson.data[0].values = graphData;
-
-            // calculate the width of the graph
-            graphJson.width = d3.select("#past-runs-graph").html(null).node().getBoundingClientRect().width-36;
-
-            // Add the graph to the div
-            vegaEmbed('#past-runs-graph',graphJson,{defaultStyle: false});
-
-            //console.log(JSON.stringify(graphJson));
-            
-        });
     }
 
     function drawChartJSGraph(runs){
@@ -405,7 +341,10 @@ function setupPastRunsPage(){
             "Total Costs",
             "Profit",
             "Avg. Profit per Run",
-            "Net Profit per Seed"
+            "Net Profit per Seed",
+            "Days Tracked",
+            "Avg. Runs per Day",
+            "Profit per Day"
         ];
 
         // Add left side text
@@ -419,6 +358,11 @@ function setupPastRunsPage(){
             d3.select("#past-run-right-info").append("div").html(stat+":");
         }
         let rightSideStatsDiv = d3.select("#past-run-right-stats");
+        
+        // Find total number of days tracked
+        let startTime = runs[0].time;
+        let endTime = runs[runs.length-1].time;
+        let daysRun = (endTime - startTime)/86400000;
 
         // Loop through all runs
         let numberOfHerbs = 0;
@@ -495,6 +439,13 @@ function setupPastRunsPage(){
         rightSideStatsDiv.append("div").html(roundToOneDecimal((netProfit - costs)/runs.length).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
         // Net Profit per Seed
         rightSideStatsDiv.append("div").html(roundToOneDecimal(netProfit/numberOfSeeds).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        
+        // Number of days tracked
+        rightSideStatsDiv.append("div").html(Math.round(daysRun));
+        // Avg. Runs per day
+        rightSideStatsDiv.append("div").html(roundToTwoDecimal(daysRun/runs.length).toLocaleString());
+        // Profit per day
+        rightSideStatsDiv.append("div").html(roundToTwoDecimal((daysRun/runs.length)*((netProfit - costs)/runs.length)).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
     }
 
     /***********************************************************

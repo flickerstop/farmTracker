@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: true }))
 
 let versionNum = null;
-const apiServer = "http://localhost:2254"; // Hosting on local
-//const apiServer = "http://192.168.2.32:2254"; // Hosting on server
+//const apiServer = "http://localhost:2254"; // Hosting on local
+const apiServer = "http://192.168.2.32:2254"; // Hosting on server
 
 // Start listening on a port
 app.listen(8080, () => {
