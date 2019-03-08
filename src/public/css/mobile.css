@@ -1,0 +1,48 @@
+.mobile #mainPanel{
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.mobile #farm-run-timer{
+    margin-top: 10px;
+}
+
+.mobile #topBar-middle, .mobile #topBar-home-button{
+    display: none;
+}
+
+.mobile #topBar-right{
+    width: 100%;
+}
+
+.mobile #settings-title{
+    display: none;
+}
+
+/***********************************************************
+** Rows
+************************************************************/
+.mobile .two-side-row{
+    height: 90px;
+}
+
+.mobile .left-side, .mobile .right-side{
+    width: 100%;
+    text-align: center;
+}
+
+.mobile .right-side{
+    margin-left: calc(50% - 92px);
+    text-align: left;
+}
+
+.mobile #alarm-play-buttons{
+    display: none;
+}
+
+/***********************************************************
+** Butttons
+************************************************************/
+.mobile #stop-run-button, .mobile #save-button{
+    width: 50%;
+}
