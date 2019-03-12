@@ -455,6 +455,8 @@ function setupPastRunsPage(){
         /////////////
         // Herb avgs
         d3.select("#pr-herb-type-title").html(`Running Herbs at ${avgPerSeed.toLocaleString()} Avg.`);
+        d3.select("#pr-herb-type-left").html("");
+        d3.select("#pr-herb-type-right").html("");
         let highest = 0;
         let highestID = "";
         for(let herbType of herbTable){
