@@ -321,6 +321,8 @@ function setupPastRunsPage(){
         d3.select("#past-run-right-stats").html(null);
 
 
+        const gpString = "<span style=\"color:#f1c40f\"> gp</span>";
+
         const leftSideInfo = [
             "Number of Runs",
             "Number of Herbs",
@@ -402,50 +404,92 @@ function setupPastRunsPage(){
         }
 
         // Number of Runs
-        leftSideStatsDiv.append("div").html(runs.length.toLocaleString());
+        statsAddLeft(runs.length.toLocaleString());
         // Number of Herbs
-        leftSideStatsDiv.append("div").html(numberOfHerbs.toLocaleString());
+        statsAddLeft(numberOfHerbs.toLocaleString());
         // Avg. Herbs Collected
-        leftSideStatsDiv.append("div").html(roundToOneDecimal(numberOfHerbs/runs.length).toLocaleString());
+        statsAddLeft(roundToOneDecimal(numberOfHerbs/runs.length).toLocaleString());
         // Avg. Herbs per Seed
-        leftSideStatsDiv.append("div").html(roundToOneDecimal(numberOfHerbs/numberOfSeeds).toLocaleString());
+        let avgPerSeed = roundToOneDecimal(numberOfHerbs/numberOfSeeds);
+        console.log(avgPerSeed);
+        statsAddLeft(avgPerSeed.toLocaleString());
         // Number of Seeds Used
-        leftSideStatsDiv.append("div").html(numberOfSeeds.toLocaleString());
+        statsAddLeft(numberOfSeeds.toLocaleString());
         // Most Herbs Collected
-        leftSideStatsDiv.append("div").html(highestCount.toLocaleString());
+        statsAddLeft(highestCount.toLocaleString());
         // Least Herbs Collected
-        leftSideStatsDiv.append("div").html(lowestCount.toLocaleString());
+        statsAddLeft(lowestCount.toLocaleString());
         // Number of Dead
-        leftSideStatsDiv.append("div").html(numberOfDead.toLocaleString());
+        statsAddLeft(numberOfDead.toLocaleString());
         // Chance of Death
-        leftSideStatsDiv.append("div").html(roundToTwoDecimal(numberOfDead/numberOfPatches*100).toLocaleString()+"%");
+        statsAddLeft(roundToTwoDecimal(numberOfDead/numberOfPatches*100).toLocaleString()+"%");
         // Successful Resurrections
-        leftSideStatsDiv.append("div").html(numberOfPassRes.toLocaleString());
+        statsAddLeft(numberOfPassRes.toLocaleString());
         // Failed Resurrections
-        leftSideStatsDiv.append("div").html(numberOfFailRes.toLocaleString());
+        statsAddLeft(numberOfFailRes.toLocaleString());
         // Resurrection Chance
-        leftSideStatsDiv.append("div").html(roundToTwoDecimal(numberOfPassRes/(numberOfPassRes+numberOfFailRes)*100).toLocaleString()+"%");
+        statsAddLeft(roundToTwoDecimal(numberOfPassRes/(numberOfPassRes+numberOfFailRes)*100).toLocaleString()+"%");
         // Number of Sick
-        leftSideStatsDiv.append("div").html(numberOfCured.toLocaleString());
+        statsAddLeft(numberOfCured.toLocaleString());
 
 
         // Net Profit
-        rightSideStatsDiv.append("div").html(netProfit.toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight(netProfit.toLocaleString() + gpString);
         // Total Costs
-        rightSideStatsDiv.append("div").html(costs.toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight(costs.toLocaleString() + gpString);
         // Profit
-        rightSideStatsDiv.append("div").html((netProfit - costs).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight((netProfit - costs).toLocaleString() + gpString);
         // Avg. Profit per Run
-        rightSideStatsDiv.append("div").html(roundToOneDecimal((netProfit - costs)/runs.length).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight(roundToOneDecimal((netProfit - costs)/runs.length).toLocaleString() + gpString);
         // Net Profit per Seed
-        rightSideStatsDiv.append("div").html(roundToOneDecimal(netProfit/numberOfSeeds).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight(roundToOneDecimal(netProfit/numberOfSeeds).toLocaleString() + gpString);
         
         // Number of days tracked
-        rightSideStatsDiv.append("div").html(Math.round(daysRun));
+        statsAddRight(Math.round(daysRun));
         // Avg. Runs per day
-        rightSideStatsDiv.append("div").html(roundToTwoDecimal(runs.length/daysRun).toLocaleString());
+        statsAddRight(roundToTwoDecimal(runs.length/daysRun).toLocaleString());
         // Profit per day
-        rightSideStatsDiv.append("div").html(roundToTwoDecimal((runs.length/daysRun)*((netProfit - costs)/runs.length)).toLocaleString() + "<span style=\"color:#f1c40f\"> gp</span>");
+        statsAddRight(roundToTwoDecimal((runs.length/daysRun)*((netProfit - costs)/runs.length)).toLocaleString() + gpString);
+    
+
+        /////////////
+        // Herb avgs
+        d3.select("#pr-herb-type-title").html(`Running Herbs at ${avgPerSeed.toLocaleString()} Avg.`);
+        let highest = 0;
+        let highestID = "";
+        for(let herbType of herbTable){
+            let herbPrice = findPrice(herbType.herbID);
+            let seedPrice = findPrice(herbType.seedID);
+            let profit = roundToTwoDecimal((herbPrice*avgPerSeed)-seedPrice);
+            let id = "pc-herb-"+herbType.name.replace(/\s+/g, '-').toLowerCase();
+            addHerbStat(herbType.name,profit.toLocaleString(),id);
+
+            if(profit > highest){
+                highest = profit;
+                highestID = id;
+            }
+        }
+
+        d3.select("#"+highestID).style("color","#9b59b6");
+
+
+        // Functions to draw
+        function findPrice(id){
+            return prices.find(x=>x.id==id).sell;
+        }
+
+        function addHerbStat(name,data,id){
+            d3.select("#pr-herb-type-left").append("div").html(name+":");
+            d3.select("#pr-herb-type-right").append("div").html(data + gpString).attr("id",id);
+        }
+
+        function statsAddRight(html){
+            rightSideStatsDiv.append("div").html(html);
+        }
+
+        function statsAddLeft(html){
+            leftSideStatsDiv.append("div").html(html);
+        }
     }
 
     /***********************************************************

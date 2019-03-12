@@ -43,8 +43,8 @@ app.route("/get/farmRun/prices").get(async (req, res) => {
 app.route("/get/version/").get(async (req, res) => {
     if(versionNum == null){
         versionNum = fs.readJSONSync("./src/json/versionNum.json");
-        versionNum.patch++;
-        fs.writeJSONSync("./src/json/versionNum.json", versionNum);
+        //versionNum.patch++;
+        //fs.writeJSONSync("./src/json/versionNum.json", versionNum);
     }
     res.send(versionNum);
 });
